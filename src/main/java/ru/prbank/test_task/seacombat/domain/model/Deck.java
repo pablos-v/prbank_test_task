@@ -10,7 +10,15 @@ public class Deck {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(name = "coordinate_x")
     private int coordinateX;
+    @Column(name = "coordinate_y")
     private int coordinateY;
-    private boolean isHit;
+    @Column(name = "is_hit")
+    private boolean isHit = false;
+
+    @Override
+    public String toString() {
+        return "(" + coordinateX + ", " + coordinateY + ")";
+    }
 }

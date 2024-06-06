@@ -1,1 +1,25 @@
-spring.application.name=SeaCombat
+spring:
+  application:
+    name: SeaCombat
+  datasource:
+#    url: jdbc:postgresql://localhost:5432/postgres
+#    username: user
+#    password: password
+#    driverClassName: org.postgresql.Driver
+    url: jdbc:h2:file:./data/devdb
+    username: sa
+    password:
+    driverClassName: org.h2.Driver
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+  liquibase:
+    enabled: true
+    change-log: classpath:db/changelog/db.changelog-master.xml
+    contexts: development, production
+    drop-first: false
+

@@ -10,20 +10,25 @@ import java.util.List;
 @Entity
 @Data
 @RequiredArgsConstructor
-@NoArgsConstructor(force = true)
+@Table(name = "games")
 public class Game {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(name  = "is_over")
-    private boolean isOver;
-    @Column(name  = "turn")
+    @Column(name = "turn")
     private boolean TurnOfSecondPlayer;
+    @Column(name = "winner")
+    private Long winnerId = -1L;
 
-    @OneToMany // TODO  @JoinColumn(name  = "players", nullable  = false)??
-    private final List<PlayingBoard> boards;
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "game_id")
+    private List<PlayingBoard> boards;
 
-    public void changeTurn(){
+    public Game(Long player1, Long player2) {
+        this.boards = List.of(new PlayingBoard(player1), new PlayingBoard(player2));
+    }
+
+    public void changeTurn() {
         TurnOfSecondPlayer = !TurnOfSecondPlayer;
     }
 
