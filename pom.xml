@@ -10,7 +10,7 @@
     </parent>
     <groupId>ru.prbank.test_task</groupId>
     <artifactId>SeaCombat</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>1.0.0</version>
     <name>SeaCombat</name>
     <description>SeaCombat</description>
     <properties>

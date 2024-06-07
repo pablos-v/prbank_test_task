@@ -1,15 +1,13 @@
+server:
+  port: 8081
 spring:
   application:
     name: SeaCombat
   datasource:
-    #    url: jdbc:postgresql://localhost:5432/postgres
-    #    username: user
-    #    password: password
-    #    driverClassName: org.postgresql.Driver
-    url: jdbc:h2:file:./data/devdb
-    username: sa
-    password:
-    driverClassName: org.h2.Driver
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: user
+    password: password
+    driverClassName: org.postgresql.Driver
   jpa:
     show-sql: true
     hibernate:

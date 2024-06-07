@@ -1,0 +1,39 @@
+version: '2.2'
+services:
+  app:
+    image: sea_combat:1.0.0
+    container_name: sea_combat_app
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "81:8081"
+      # зависимость чтобы БД поднялась раньше
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      - SERVER_PORT=8081
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db/postgres
+
+  db:
+    image: postgres:14.7-alpine
+    container_name: sea_combat_db
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+    volumes:
+      # чтобы изменения в БД не потерялись при перезапуске образа
+      - db-data:/var/lib/postgresql/data
+    restart: always
+    # убедиться что БД уже точно поднялась
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-q", "-d", "postgres", "-U", "user" ]
+      interval: 1s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  db-data:
