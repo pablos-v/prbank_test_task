@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.6.xsd">
+
+    <changeSet id="create-tables" author="pablos-v">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="PLAYERS"/>
+                <tableExists tableName="GAMES"/>
+                <tableExists tableName="BOARDS"/>
+                <tableExists tableName="SHIPS"/>
+                <tableExists tableName="DECKS"/>
+            </not>
+        </preConditions>
+        <!-- Create GAMES table -->
+        <createTable tableName="GAMES">
+            <column name="ID" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="TURN" type="BOOLEAN"/>
+            <column name="WINNER" type="BIGINT"/>
+        </createTable>
+
+        <!-- Create BOARDS table -->
+        <createTable tableName="BOARDS">
+            <column name="ID" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="OWNER" type="BIGINT"/>
+            <column name="GAME_ID" type="BIGINT">
+                <constraints nullable="true" foreignKeyName="fk-boards-game" references="games(id)"/>
+            </column>
+        </createTable>
+
+        <!-- Create PLAYERS table -->
+        <createTable tableName="PLAYERS">
+            <column name="ID" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="NAME" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <!-- Create SHIPS table -->
+        <createTable tableName="SHIPS">
+            <column name="ID" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="IS_DESTROYED" type="BOOLEAN"/>
+            <column name="BOARD_ID" type="BIGINT">
+                <constraints nullable="true" foreignKeyName="fk-ships-board" references="boards(id)"/>
+            </column>
+        </createTable>
+
+        <!-- Create DECKS table -->
+        <createTable tableName="DECKS">
+            <column name="ID" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="COORDINATE_X" type="INTEGER"/>
+            <column name="COORDINATE_Y" type="INTEGER"/>
+            <column name="IS_HIT" type="BOOLEAN"/>
+            <column name="SHIP_ID" type="BIGINT">
+                <constraints nullable="true" foreignKeyName="fk-decks-ship" references="ships(id)"/>
+            </column>
+        </createTable>
+
+    </changeSet>
+
+</databaseChangeLog>
