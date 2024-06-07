@@ -9,6 +9,7 @@ services:
     ports:
       - "81:8081"
       # зависимость чтобы БД поднялась раньше
+    restart: always
     depends_on:
       db:
         condition: service_healthy
@@ -23,7 +24,7 @@ services:
       POSTGRES_USER: user
       POSTGRES_PASSWORD: password
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
       # чтобы изменения в БД не потерялись при перезапуске образа
       - db-data:/var/lib/postgresql/data
