@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 import java.util.List;
 
 /**
- *
+ * Сущность в БД. Описывает игровую доску, имеет список кораблей на ней, и содержит параметры размера доски и количества типов кораблей.
  */
 @Entity
 @Data
@@ -33,9 +33,15 @@ public class PlayingBoard {
         this.ownerId = ownerId;
     }
 
-    public boolean amountExceeded(int checkingSize) {
-        long countShipsOfThatSize = ships.stream().filter(it -> it.getDecks().size() == checkingSize).count();
-        return countShipsOfThatSize >= maxAmountOfShips(checkingSize);
+    /**
+     * Проверка кол-ва кораблей по их типам.
+     * @param deckCount - тип корабля (кол-во его дек).
+     * @return - true, если кол-во кораблей превышает максимальное кол-во, иначе false.
+     */
+    public boolean isShipLimitReached(int deckCount) {
+        if (ships == null || deckCount < 1 || deckCount > 4) return true;
+        long countShipsOfThatSize = ships.stream().filter(it -> it.getDecks().size() == deckCount).count();
+        return countShipsOfThatSize >= maxAmountOfShips(deckCount);
     }
 
     private int maxAmountOfShips(int size) {

@@ -4,26 +4,36 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.prbank.test_task.seacombat.domain.exception.CoordinatesException;
 import ru.prbank.test_task.seacombat.domain.exception.ShipFormException;
-import ru.prbank.test_task.seacombat.domain.exception.ShipsAmountException;
-import ru.prbank.test_task.seacombat.domain.model.Game;
+import ru.prbank.test_task.seacombat.domain.exception.ShipsLimitException;
 import ru.prbank.test_task.seacombat.domain.model.Deck;
+import ru.prbank.test_task.seacombat.domain.model.Game;
 import ru.prbank.test_task.seacombat.domain.model.PlayingBoard;
 import ru.prbank.test_task.seacombat.domain.model.Ship;
-import ru.prbank.test_task.seacombat.repository.ShipRepository;
 
 import java.util.List;
 
+/**
+ * Реализация сервиса работы с объектами кораблей.
+ */
 @Service
 @AllArgsConstructor
 public class ShipServiceImpl implements ShipService {
-    private final ShipRepository repository;
-
+    /**
+     * Реализация метода {@link ShipService#validateShip(Game, PlayingBoard, Ship)}
+     * См. описание метода в интерфейсе {@link ShipService}
+     *
+     * @throws RuntimeException исключения пробрасываются дальше по стеку и обрабатываются контроллером.
+     */
     @Override
     public void validateShip(Game game, PlayingBoard boardForPut, Ship ship) throws RuntimeException {
         // Проверка, что игрок не пытается разместить больше кораблей этого типа, чем разрешено
         int size = ship.getDecks().size();
-        if (boardForPut.amountExceeded(size))
-            throw new ShipsAmountException("No more ships of size " + size + " allowed");
+        if (boardForPut.isShipLimitReached(size))
+            throw new ShipsLimitException("No more ships of size " + size + " is allowed");
+
+        // Проверка, что корабль не выходит за пределы поля
+        if (!ship.isInBounds())
+            throw new CoordinatesException("Ship with decks: " + ship.getDecks() + " is out of field bounds");
 
         // Проверка, что корабль не гнутый
         if (!ship.isStraight()) throw new ShipFormException("Ship with decks: " + ship.getDecks() + " is not straight");
@@ -31,17 +41,19 @@ public class ShipServiceImpl implements ShipService {
         // Проверка, что корабль цельный
         if (!ship.isSolid()) throw new ShipFormException("Ship with decks: " + ship.getDecks() + " is not solid");
 
-        // Проверка, что корабль не выходит за пределы поля
-        if (!ship.isInBounds())
-            throw new CoordinatesException("Ship with decks: " + ship.getDecks() + " is out of field bounds");
-
-        // Проверка, что корабль не липнет к соседям
-        if (isOverlay(boardForPut, ship))
-            throw new CoordinatesException("Ship with decks:  " + ship.getDecks() + " could not be too close to existing " +
+        // Проверка, что корабль не липнет к соседям и не перекрывает их
+        if (isOverlap(boardForPut, ship))
+            throw new CoordinatesException("Ship with decks: " + ship.getDecks() + " could not be too close to existing " +
                     "ships");
     }
 
-    private boolean isOverlay(PlayingBoard boardForPut, Ship ship) {
+    /**
+     * Проверка, что новый корабль не перекрывает поля другого корабля
+     * @param boardForPut Игровая доска с умеющимися кораблями
+     * @param ship проверяемый корабль
+     * @return возвращает true, если корабль перекрывает поля другого корабля
+     */
+    private boolean isOverlap(PlayingBoard boardForPut, Ship ship) {
         List<Deck> existingDecks = boardForPut.getShips().stream()
                 .flatMap(it -> it.getDecks().stream())
                 .toList();
@@ -60,6 +72,6 @@ public class ShipServiceImpl implements ShipService {
                 return true; // Найдена соседняя клетка, или та же
             }
         }
-        return false; // Не найдено соседних клеток
+        return false;
     }
 }

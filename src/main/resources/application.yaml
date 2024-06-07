@@ -2,10 +2,10 @@ spring:
   application:
     name: SeaCombat
   datasource:
-#    url: jdbc:postgresql://localhost:5432/postgres
-#    username: user
-#    password: password
-#    driverClassName: org.postgresql.Driver
+    #    url: jdbc:postgresql://localhost:5432/postgres
+    #    username: user
+    #    password: password
+    #    driverClassName: org.postgresql.Driver
     url: jdbc:h2:file:./data/devdb
     username: sa
     password:
@@ -14,12 +14,18 @@ spring:
     show-sql: true
     hibernate:
       ddl-auto: validate
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.H2Dialect
   liquibase:
     enabled: true
     change-log: classpath:db/changelog/db.changelog-master.xml
     contexts: development, production
     drop-first: false
-
+logging:
+  level:
+    org.springframework: INFO
+    ru.prbank.test_task.seacombat: DEBUG
+  logback:
+    rollingpolicy:
+      max-file-size: 10MB
+      max-history: 5
+  file:
+    name: ./logs/${spring.application.name}.log

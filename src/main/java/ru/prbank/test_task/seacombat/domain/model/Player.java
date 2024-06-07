@@ -3,8 +3,9 @@ package ru.prbank.test_task.seacombat.domain.model;
 import jakarta.persistence.*;
 import lombok.Data;
 
-import java.util.List;
-
+/**
+ * Сущность в БД. Описывает игрока.
+ */
 @Data
 @Entity
 @Table(name = "players")

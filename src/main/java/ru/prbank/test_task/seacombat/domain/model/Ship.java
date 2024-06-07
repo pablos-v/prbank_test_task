@@ -1,30 +1,42 @@
 package ru.prbank.test_task.seacombat.domain.model;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
 /**
- * Класс описывает корабль
+ * Сущность в БД. Описывает корабль, имеет методы самопроверки.
  */
 @Data
 @Entity
 @Table(name = "ships")
+@Schema(name = "Ship", description = "One of the main entities in the game. No more ships left - you loose.")
+@NoArgsConstructor
 public class Ship {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(name = "is_destroyed")
-    private boolean isDestroyed = false;
+    private boolean isDestroyed;
 
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "ship_id")
     private List<Deck> decks;
 
+    public Ship(List<Deck> decks) {
+        this.decks = decks;
+    }
+
+    /**
+     * Проверка что корабль прямой, не изгибается.
+     * @return true если деки корабля расположены на одной прямой по вертикали или горизонтали.
+     */
     public boolean isStraight() {
-        List<Deck> decks = getDecks();
+        if (decks == null || decks.isEmpty()) return false;
         if (decks.size() == 1) return true;
         int firstPointX = decks.get(0).getCoordinateX();
         int firstPointY = decks.get(0).getCoordinateY();
@@ -33,15 +45,24 @@ public class Ship {
                 || decks.stream().allMatch(deck -> deck.getCoordinateY() == firstPointY);
     }
 
+    /**
+     * Проверка что корабль цельный.
+     * @return true если деки корабля расположены последовательно, без прерываний.
+     */
     public boolean isSolid() {
-        List<Deck> decks = getDecks();
+        if (decks == null || decks.isEmpty()) return false;
         if (decks.size() == 1) return true;
         int[] dimensionX = decks.stream().mapToInt(Deck::getCoordinateX).toArray();
         int[] dimensionY = decks.stream().mapToInt(Deck::getCoordinateY).toArray();
-        // все точки одного из измерений должны идти последовательно (1,2) (1,3) (1,4)
+        // Все точки одного из измерений должны идти последовательно (1,2) (1,3) (1,4).
         return isConsistent(dimensionX) || isConsistent(dimensionY);
     }
 
+    /**
+     * Проверка массива на последовательность.
+     * @param dimension - массив значений одной из координат.
+     * @return true если значения идут последовательно.
+     */
     private boolean isConsistent(int[] dimension) {
         for (int i = 0; i < dimension.length - 1; i++) {
             if (dimension[i] + 1 != dimension[i + 1]) return false;
@@ -49,7 +70,12 @@ public class Ship {
         return true;
     }
 
+    /**
+     * Проверка что корабль в границах игрового поля.
+     * @return true если предельные координаты не выходят за ограничения поля.
+     */
     public boolean isInBounds() {
+        if (decks == null || decks.isEmpty()) return false;
         int maxX = decks.stream().mapToInt(Deck::getCoordinateX).max().orElse(0);
         int maxY = decks.stream().mapToInt(Deck::getCoordinateY).max().orElse(0);
         int minX = decks.stream().mapToInt(Deck::getCoordinateX).min().orElse(0);
