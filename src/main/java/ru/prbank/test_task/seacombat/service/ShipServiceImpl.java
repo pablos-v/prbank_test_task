@@ -6,7 +6,6 @@ import ru.prbank.test_task.seacombat.domain.exception.CoordinatesException;
 import ru.prbank.test_task.seacombat.domain.exception.ShipFormException;
 import ru.prbank.test_task.seacombat.domain.exception.ShipsLimitException;
 import ru.prbank.test_task.seacombat.domain.model.Deck;
-import ru.prbank.test_task.seacombat.domain.model.Game;
 import ru.prbank.test_task.seacombat.domain.model.PlayingBoard;
 import ru.prbank.test_task.seacombat.domain.model.Ship;
 
@@ -19,13 +18,13 @@ import java.util.List;
 @AllArgsConstructor
 public class ShipServiceImpl implements ShipService {
     /**
-     * Реализация метода {@link ShipService#validateShip(Game, PlayingBoard, Ship)}
+     * Реализация метода {@link ShipService#validateShip(PlayingBoard, Ship)}
      * См. описание метода в интерфейсе {@link ShipService}
      *
      * @throws RuntimeException исключения пробрасываются дальше по стеку и обрабатываются контроллером.
      */
     @Override
-    public void validateShip(Game game, PlayingBoard boardForPut, Ship ship) throws RuntimeException {
+    public void validateShip(PlayingBoard boardForPut, Ship ship) throws RuntimeException {
         // Проверка, что игрок не пытается разместить больше кораблей этого типа, чем разрешено
         int size = ship.getDecks().size();
         if (boardForPut.isShipLimitReached(size))

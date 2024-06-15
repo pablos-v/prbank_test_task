@@ -1,9 +1,9 @@
 package ru.prbank.test_task.seacombat.service;
 
+import org.springframework.transaction.annotation.Transactional;
 import ru.prbank.test_task.seacombat.domain.enums.ShotResult;
 import ru.prbank.test_task.seacombat.domain.exception.*;
 import ru.prbank.test_task.seacombat.domain.model.Game;
-import ru.prbank.test_task.seacombat.domain.model.Ship;
 
 /**
  * Интерфейс взаимодействия с игрой.
@@ -17,6 +17,7 @@ public interface GameService {
      * @return ID созданной игры
      * @throws PlayerNotFoundException если хотя бы один из игроков не существует
      */
+    @Transactional
     Long createGame(Long player1, Long player2) throws PlayerNotFoundException;
 
     /**
@@ -34,7 +35,10 @@ public interface GameService {
      *
      * @param gameId   ID игры.
      * @param playerId ID игрока.
-     * @param ship     Объект располагаемого корабля.
+     * @param headX x-координата первой деки
+     * @param headY y-координата первой деки
+     * @param tailX x-координата последней деки
+     * @param tailY y-координата последней деки
      * @throws PlayerNotFoundException если игрок не существует.
      * @throws GameNotFoundException   если игра не существует.
      * @throws CoordinatesException    если координаты корабля не верные.
@@ -43,8 +47,10 @@ public interface GameService {
      * @throws ShipNotFoundException   если корабль не найден.
      * @throws BoardNotFoundException  если игровой доски не существует.
      */
-    void putShip(Long gameId, Long playerId, Ship ship) throws PlayerNotFoundException, GameNotFoundException,
-            CoordinatesException, ShipFormException, ShipsLimitException, BoardNotFoundException, ShipNotFoundException;
+    @Transactional
+    void putShip(Long gameId, Long playerId, int headX, int headY, int tailX, int tailY) throws PlayerNotFoundException,
+            GameNotFoundException, CoordinatesException, ShipFormException, ShipsLimitException, BoardNotFoundException,
+            ShipNotFoundException;
 
     /**
      * Сделать выстрел. Стреляющий игрок должен быть участником в данной игре. Метод обновляет состояние БД.
@@ -59,6 +65,7 @@ public interface GameService {
      * @throws CoordinatesException    если координаты корабля не верные.
      * @throws WrongTurnException      если право сделать ход у другого игрока.
      */
+    @Transactional
     ShotResult shoot(Long gameId, Long playerId, int x, int y) throws PlayerNotFoundException, GameNotFoundException,
             CoordinatesException, WrongTurnException;
 

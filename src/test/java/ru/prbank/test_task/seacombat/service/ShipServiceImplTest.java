@@ -32,7 +32,7 @@ class ShipServiceImplTest {
     public void validateShipSuccess() {
         Ship ship = new Ship(List.of(new Deck(1, 1), new Deck(1, 2), new Deck(1, 3)));
 
-        assertDoesNotThrow(() -> shipService.validateShip(game, board, ship));
+        assertDoesNotThrow(() -> shipService.validateShip(board, ship));
     }
 
     @Test
@@ -42,7 +42,7 @@ class ShipServiceImplTest {
         board.setShips(List.of(oldShip));
 
         ShipsLimitException exception = assertThrows(ShipsLimitException.class,
-                () -> shipService.validateShip(game, board, newShip));
+                () -> shipService.validateShip(board, newShip));
 
         assertEquals("No more ships of size 4 is allowed", exception.getMessage());
     }
@@ -52,7 +52,7 @@ class ShipServiceImplTest {
         Ship notStraightShip = new Ship(List.of(new Deck(1, 1), new Deck(1, 2), new Deck(2, 2)));
 
         ShipFormException exception = assertThrows(ShipFormException.class,
-                () -> shipService.validateShip(game, board, notStraightShip));
+                () -> shipService.validateShip(board, notStraightShip));
 
         assertEquals("Ship with decks: " + notStraightShip.getDecks() + " is not straight", exception.getMessage());
     }
@@ -62,7 +62,7 @@ class ShipServiceImplTest {
         Ship notSolidShip = new Ship(List.of(new Deck(1, 1), new Deck(1, 2), new Deck(1, 8)));
 
         ShipFormException exception = assertThrows(ShipFormException.class,
-                () -> shipService.validateShip(game, board, notSolidShip));
+                () -> shipService.validateShip(board, notSolidShip));
 
         assertEquals("Ship with decks: " + notSolidShip.getDecks() + " is not solid", exception.getMessage());
     }
@@ -72,7 +72,7 @@ class ShipServiceImplTest {
         Ship ship = new Ship(List.of(new Deck(21, -3)));
 
         CoordinatesException exception = assertThrows(CoordinatesException.class,
-                () -> shipService.validateShip(game, board, ship));
+                () -> shipService.validateShip(board, ship));
 
         assertEquals("Ship with decks: " + ship.getDecks() + " is out of field bounds", exception.getMessage());
     }
@@ -84,7 +84,7 @@ class ShipServiceImplTest {
         board.setShips(List.of(oldShip));
 
         CoordinatesException exception = assertThrows(CoordinatesException.class,
-                () -> shipService.validateShip(game, board, newShip));
+                () -> shipService.validateShip(board, newShip));
 
         assertEquals("Ship with decks: " + oldShip.getDecks() + " could not be too close to existing ships", exception.getMessage());
     }
