@@ -11,7 +11,7 @@ import ru.prbank.test_task.seacombat.domain.exception.PlayerNotFoundException;
 import ru.prbank.test_task.seacombat.domain.model.Ship;
 import ru.prbank.test_task.seacombat.service.GameService;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
 class MainControllerTest {
@@ -53,18 +53,18 @@ class MainControllerTest {
 
     @Test
     public void putShipSuccess() {
-        doNothing().when(gameService).putShip(gameId, player1, ship);
+        doNothing().when(gameService).putShip(gameId, player1, 1, 1, 1 ,1);
 
-        ResponseEntity<?> response = mainController.putShip(gameId, player1, ship);
+        ResponseEntity<?> response = mainController.putShip(gameId, player1, 1, 1, 1, 1);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
     }
 
     @Test
     public void putShipGameNotFoundException()   {
-        doThrow(new GameNotFoundException("Game not found")).when(gameService).putShip(gameId, player1, ship);
+        doThrow(new GameNotFoundException("Game not found")).when(gameService).putShip(gameId, player1,  1, 1, 1, 1);
 
-        ResponseEntity<?> response = mainController.putShip(gameId, player1, ship);
+        ResponseEntity<?> response = mainController.putShip(gameId, player1,  1, 1, 1, 1);
 
         assertEquals(ResponseEntity.badRequest().body("Game not found"), response);
     }

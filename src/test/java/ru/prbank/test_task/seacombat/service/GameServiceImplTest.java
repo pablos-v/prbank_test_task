@@ -103,8 +103,8 @@ class GameServiceImplTest {
 
         when(gameRepository.findById(gameId)).thenReturn(Optional.of(game));
 
-        gameService.putShip(gameId, player1, ship1);
-        gameService.putShip(gameId, player2, ship2);
+        gameService.putShip(gameId, player1, 5, 5, 5, 5);
+        gameService.putShip(gameId, player2, 2, 1, 2, 2);
 
         assertTrue(game.getBoards().get(0).getShips().contains(ship1));
         assertTrue(game.getBoards().get(1).getShips().contains(ship2));
@@ -119,7 +119,7 @@ class GameServiceImplTest {
         when(gameRepository.findById(gameId)).thenReturn(Optional.of(game));
 
         GameNotFoundException exc = assertThrows(GameNotFoundException.class,
-                () -> gameService.putShip(gameId, player1, ship1));
+                () -> gameService.putShip(gameId, player1, 5, 5, 5, 5));
         assertEquals("Game with ID 20 is over", exc.getMessage());
     }
 
@@ -130,7 +130,7 @@ class GameServiceImplTest {
         when(gameRepository.findById(gameId)).thenReturn(Optional.empty());
 
         GameNotFoundException exc = assertThrows(GameNotFoundException.class,
-                () -> gameService.putShip(gameId, player1, ship1));
+                () -> gameService.putShip(gameId, player1, 5, 5, 5, 5));
         assertEquals("Game with ID 999 not found", exc.getMessage());
     }
 
@@ -142,45 +142,32 @@ class GameServiceImplTest {
         when(gameRepository.findById(gameId)).thenReturn(Optional.of(game));
 
         PlayerNotFoundException exc = assertThrows(PlayerNotFoundException.class,
-                () -> gameService.putShip(gameId, player2, ship1));
+                () -> gameService.putShip(gameId, player2, 5, 5, 5, 5));
         assertEquals("Player with ID 3 not found in game with ID 55", exc.getMessage());
     }
 
     @Test
     public void putShipBoundsCoordinatesException() {
         Long gameId = 1L;
-        ship1 = new Ship(List.of(new Deck(11, 5), new Deck(12, 5)));
+        ship1 = new Ship(List.of(new Deck(11, 5), new Deck(11, 6)));
 
         when(gameRepository.findById(gameId)).thenReturn(Optional.of(game));
 
         CoordinatesException exc = assertThrows(CoordinatesException.class,
-                () -> gameService.putShip(gameId, player1, ship1));
+                () -> gameService.putShip(gameId, player1, 11, 5, 11, 6));
         assertEquals("Ship with decks: " + ship1.getDecks() + " is out of field bounds", exc.getMessage());
     }
 
     @Test
-    public void putShipNotStraightShipFormException()  {
+    public void putShipNotAtLineCoordinatesException()  {
         Long gameId = 1L;
         ship1 = new Ship(List.of(new Deck(1, 1), new Deck(1, 2), new Deck(2, 2)));
 
         when(gameRepository.findById(gameId)).thenReturn(Optional.of(game));
 
-        ShipFormException exc = assertThrows(ShipFormException.class,
-                () -> gameService.putShip(gameId, player1, ship1));
-        assertEquals("Ship with decks: " + ship1.getDecks() + " is not straight",
-                exc.getMessage());
-    }
-
-    @Test
-    public void putShipNotSolidShipFormException()  {
-        Long gameId = 1L;
-        ship1 = new Ship(List.of(new Deck(1, 1), new Deck(1, 7)));
-
-        when(gameRepository.findById(gameId)).thenReturn(Optional.of(game));
-
-        ShipFormException exc = assertThrows(ShipFormException.class,
-                () -> gameService.putShip(gameId, player1, ship1));
-        assertEquals("Ship with decks: " + ship1.getDecks() + " is not solid",
+        CoordinatesException exc = assertThrows(CoordinatesException.class,
+                () -> gameService.putShip(gameId, player1, 1, 1, 2, 2));
+        assertEquals("Ship coordinates must be at one line",
                 exc.getMessage());
     }
 
@@ -195,7 +182,7 @@ class GameServiceImplTest {
         when(gameRepository.findById(gameId)).thenReturn(Optional.of(game));
 
         CoordinatesException exc = assertThrows(CoordinatesException.class,
-                () -> gameService.putShip(gameId, player1, ship1));
+                () -> gameService.putShip(gameId, player1, 1, 1, 1, 2));
         assertEquals("Ship with decks: " + ship1.getDecks() + " could not be too close to existing ships",
                 exc.getMessage());
     }
